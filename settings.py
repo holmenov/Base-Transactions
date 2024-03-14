@@ -45,6 +45,8 @@
     increase_allowance      |   Increase Allowance to random address.
     approve                 |   Approve to random address.
     transfer                |   Transfer to random address.
+    okx_withdraw            |   Deposit funds to your wallet from OKX.
+    okx_top_up              |   Top up wallet if the balance is less than required.
 
 -----------------------------------------------------------------------------------------------
 """
@@ -71,11 +73,7 @@ class MainSettings:
     LANDINGS_SLEEP = [30, 90]
 
     CUSTOM_ROUTES_MODULES = [
-        ['deposit_aave'],
-        ['swap_inch', 'swap_uniswap', 'swap_woofi'],
-        ['wrap_eth', 'nfts2me_mint'],
-        ['send_mail', 'rubyscore_vote', 'owlto_checkin'],
-        ['increase_allowance', 'approve', 'transfer', None]
+        []
     ]
 
 """
