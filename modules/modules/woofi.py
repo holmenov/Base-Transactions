@@ -6,8 +6,8 @@ from utils.wrappers import check_gas
 
 
 class WooFi(Account):
-    def __init__(self, account_id: int, private_key: str, proxy: str | None, chain: str = 'zksync') -> None:
-        super().__init__(account_id, private_key, proxy, chain)
+    def __init__(self, account_id: int, private_key: str, proxy: str | None) -> None:
+        super().__init__(account_id, private_key, proxy)
     
         self.woofi_contract = self.get_contract(WOOFI_CONTRACTS["router"], WOOFI_ABI)
     

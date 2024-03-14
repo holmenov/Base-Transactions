@@ -103,7 +103,7 @@ class OKXSettings:
     CHAIN = 'Base'
     FEE = 0.0002
 
-    AMOUNT_WITHDRAW = [0.025, 0.04]
+    AMOUNT_WITHDRAW = [0.011, 0.012]
 
     BALANCE_TOP_UP = 0.01
     

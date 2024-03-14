@@ -11,11 +11,11 @@ from utils.config import BASE_TOKENS
 
 
 class OKXWithdraw(Account):
-    def __init__(self, account_id: int, private_key: str, proxy: str | None, chain: str = 'zksync') -> None:
-        super().__init__(account_id, private_key, proxy, chain)
+    def __init__(self, account_id: int, private_key: str, proxy: str | None) -> None:
+        super().__init__(account_id, private_key, proxy)
 
         self.symbol = OKXSettings.SYMBOL
-        self.amount = round(random.uniform(OKXSettings.AMOUNT_WITHDRAW[0], OKXSettings.AMOUNT_WITHDRAW[1]), 5)
+        self.amount = round(random.uniform(OKXSettings.AMOUNT_WITHDRAW[0], OKXSettings.AMOUNT_WITHDRAW[1]), 6)
         self.fee = OKXSettings.FEE
         self.chain = OKXSettings.CHAIN
         self.api_key = OKXSettings.API_KEY
