@@ -131,6 +131,8 @@ class OKXSettings:
     
     SWAP_REVERSE = True             |   Doing a reverse swap for the same amount?
     
+    API_KEY = 'YOUR-API-KEY'        |   Get your API key on the site for the module to work.
+    
     WITHDRAW = True                 |   To withdraw liquidity from landing protocols or not.
     
     TOKENS = ['USDT', 'USDC']       |   Tokens list for work. You can choose one or several tokens.
@@ -176,6 +178,8 @@ class ModulesSettings:
         PERCENTS = [3, 7]
         
         SWAP_REVERSE = True
+        
+        API_KEY = 'YOUR-API-KEY' # https://1inch.dev/portfolio-api/
     
     class WooFi:
         FROM_TOKEN = 'ETH'

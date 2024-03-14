@@ -66,7 +66,9 @@ async def swap_inch(account_id, key, proxy):
     min_percent = ms.Inch.PERCENTS[0]
     max_percent = ms.Inch.PERCENTS[1]
     
-    inch = Inch(account_id, key, proxy)
+    api_key = ms.Inch.API_KEY
+    
+    inch = Inch(account_id, key, proxy, api_key)
     await inch.swap(
         from_token, to_token, min_amount, max_amount, decimal, all_amount, min_percent, max_percent, swap_reverse
     )
