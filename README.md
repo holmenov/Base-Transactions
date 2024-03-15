@@ -7,7 +7,6 @@ This software allows you to create automated transactions on the **Base Network*
 - Check wallets balance.
 - Swap on 1inch.
 - Swap on UniSwap.
-- Swap on WooFi.
 - Deposit and withdraw on Aave.
 - Send mail via Dmail.
 - Mint NFTs on NFTS2ME.

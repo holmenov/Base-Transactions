@@ -28,11 +28,11 @@ with open('data/rubyscore/abi.json', "r") as file:
 with open('data/owlto/abi.json', "r") as file:
     OWLTO_ABI = json.load(file)
 
-with open('data/woofi/abi.json', "r") as file:
-    WOOFI_ABI = json.load(file)
+with open('data/sushiswap/quoter.json', "r") as file:
+    SUSHISWAP_QUOTER_ABI = json.load(file)
 
-with open('data/uniswap/factory.json', "r") as file:
-    UNISWAP_FACTORY_ABI = json.load(file)
+with open('data/sushiswap/router.json', "r") as file:
+    SUSHISWAP_ROUTER_ABI = json.load(file)
 
 with open('data/uniswap/quoter.json', "r") as file:
     UNISWAP_QUOTER_ABI = json.load(file)
@@ -48,19 +48,16 @@ with open('data/nfts2me/abi.json', "r") as file:
 
 MAX_APPROVE = 2**256 - 1
 
+ETH_MASK = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 DMAIL_CONTRACT = '0x47fbe95e981C0Df9737B6971B451fB15fdC989d9'
 
 OWLTO_CONTRACT = '0xd48e3caf0d948203434646a3f3e80f8ee18007dc'
 
-WOOFI_CONTRACTS = {
-    "router": "0x27425e9fb6a9a625e8484cfd9620851d1fa322e5",
-}
-
 UNISWAP_CONTRACTS = {
     "router": "0x2626664c2603336E57B271c5C0b26F421741e481",
-    "factory": "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
     "quoter": "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a",
 }
 

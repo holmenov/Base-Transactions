@@ -14,7 +14,6 @@ from modules.modules.owlto import OwlTo
 from modules.modules.okx_topup import OKXTopUp
 from modules.modules.tokens import Tokens
 from modules.modules.balance_checker import BalanceChecker
-from modules.modules.woofi import WooFi
 
 
 async def okx_withdraw(account_id: int, key: str, proxy: str):
@@ -30,26 +29,6 @@ async def okx_top_up(account_id: int, key: str, proxy: str):
     
     okx_top_up = OKXTopUp(account_id, key, proxy)
     await okx_top_up.top_up_balance(amount, wait_balance)
-
-async def swap_woofi(account_id, key, proxy):
-    from_token = ms.WooFi.FROM_TOKEN
-    to_token = ms.WooFi.TO_TOKEN
-    
-    min_amount = ms.WooFi.AMOUNT[0]
-    max_amount = ms.WooFi.AMOUNT[1]
-    decimal = ms.WooFi.DECIMAL
-    
-    all_amount = ms.WooFi.USE_PERCENTS
-    
-    swap_reverse = ms.WooFi.SWAP_REVERSE
-    
-    min_percent = ms.WooFi.PERCENTS[0]
-    max_percent = ms.WooFi.PERCENTS[1]
-    
-    woofi = WooFi(account_id, key, proxy)
-    await woofi.swap(
-        from_token, to_token, min_amount, max_amount, decimal, all_amount, min_percent, max_percent, swap_reverse
-    )
 
 async def swap_inch(account_id, key, proxy):
     from_token = ms.Inch.FROM_TOKEN

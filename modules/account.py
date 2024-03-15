@@ -1,5 +1,7 @@
 import random
+import time
 from typing import Union
+from aiohttp import ClientSession
 import eth_account
 from loguru import logger
 from web3 import AsyncWeb3
@@ -17,9 +19,11 @@ class Account:
         self.account_id = account_id
         self.private_key = private_key
         
+        self.chain_name = chain
+        self.chain_id = RPC[chain]['chain_id']
         self.explorer = RPC[chain]['explorer']
         self.rpc = RPC[chain]['rpc']
-        self.eip_1559_support = False
+        self.eip_1559_support = True
 
         self.proxy = f"http://{proxy}" if proxy else ""
         self.request_kwargs = {'proxy': f'http://{proxy}'} if proxy else {}
@@ -39,6 +43,21 @@ class Account:
             'warning'   : logger.warning,
             'debug'     : logger.debug
         }
+    
+    async def make_request(
+        self, method: str = 'GET', url: str = None, headers: dict = None,
+        params: dict = None, data: str = None, json: dict = None
+    ):
+        async with ClientSession() as session:
+            async with session.request(
+                method=method, url=url, headers=headers, data=data, params=params, json=json
+            ) as response:
+                data = await response.json()
+                if response.status == 200:
+                    return data
+                else:
+                    await async_sleep(1, 3, logs=False)
+                    await self.make_request(method=method, url=url, headers=headers, data=data, params=params, json=json)
     
     def log_send(self, msg: str, status: str = 'info'):
         self.LOG_LEVELS[status](f'Account №{self.account_id} | {self.address} | {msg}')
@@ -111,7 +130,7 @@ class Account:
         allowance_amount = await self.get_allowance(token_address, contract_address)
 
         if amount_wei > allowance_amount:
-            ('Make approve.')
+            self.log_send('Make approve.')
 
             tx_data = await self.get_tx_data()
 
@@ -164,24 +183,24 @@ class Account:
                 status = receipts.get('status')
 
                 if status == 1:
-                    return self.log_send(f'{self.explorer}{hash.hex()} successfully!', status='success')
+                    self.log_send(f'{self.explorer}{hash.hex()} successfully!', status='success')
+                    return True
                 elif status is None:
                     await async_sleep(10, 10, logs=False)
                 else:
-                    return self.log_send(f'{self.explorer}{hash.hex()} transaction failed!', status='error')
+                    self.log_send(f'{self.explorer}{hash.hex()} transaction failed!', status='error')
+                    return False
             
             except TransactionNotFound:
                 if attempts_count >= 30:
-                    return self.log_send(f'{self.explorer}{hash.hex()} transaction not found!', status='warning')
+                    self.log_send(f'{self.explorer}{hash.hex()} transaction not found!', status='warning')
+                    return False
                 
                 attempts_count += 1
                 await async_sleep(10, 10, logs=False)
     
-    async def execute_transaction(self, tx: TxParams, wait_complete: bool = True):
+    async def execute_transaction(self, tx: TxParams):
         signed_tx = await self.sign(tx)
         tx_hash = await self.send_raw_transaction(signed_tx)
 
-        if wait_complete:
-            await self.wait_until_tx_finished(tx_hash)
-        else:
-            return tx_hash
+        return await self.wait_until_tx_finished(tx_hash)

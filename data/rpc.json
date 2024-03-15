@@ -2,12 +2,14 @@
     "ethereum": {
         "rpc": "https://rpc.ankr.com/eth",
         "explorer": "https://etherscan.io/tx/",
-        "token": "ETH"
+        "token": "ETH",
+        "chain_id": 1
     },
     
     "base": {
         "rpc": "https://rpc.ankr.com/base",
         "explorer": "https://basescan.org/tx/",
-        "token": "ETH"
+        "token": "ETH",
+        "chain_id": 8453
     }
 }

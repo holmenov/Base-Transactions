@@ -18,7 +18,6 @@ submenus = {
     ],
     'one_selected_module': [
         questionary.Choice('● Swap on 1inch', swap_inch),
-        questionary.Choice('● Swap on WooFi', swap_woofi),
         questionary.Choice('● Swap on UniSwap', swap_uniswap),
         questionary.Choice('● Deposit on Aave', deposit_aave),
         questionary.Choice('● Wrap ETH', wrap_eth),
@@ -60,7 +59,7 @@ def main():
     if selected_mode in submenus: selected_mode = show_submenu(selected_mode)
     elif selected_mode == 'balance-checker': asyncio.run(run_check_balance(data))
     elif selected_mode == 'exit': sys.exit()
-    else: asyncio.run(start_tasks(data, selected_mode))
+    else: asyncio.run(start_tasks(data, None))
 
 if __name__ == '__main__':
     logger.add('logs.log')

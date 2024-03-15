@@ -25,7 +25,7 @@
     
     CUSTOM_ROUTES_MODULES = [                               |   With custom routes modules you can make your own routes.
         ['deposit_aave'],                                   |   One line - one transaction.
-        ['swap_inch', 'swap_uniswap', 'swap_woofi'],        |   You can specify any number of functions on each line.
+        ['swap_inch', 'swap_uniswap'],                      |   You can specify any number of functions on each line.
         ['wrap_eth', 'nfts2me_mint'],                       |   The software will select a random function in the list.
         ['send_mail', 'rubyscore_vote', 'owlto_checkin'],
         ['increase_allowance', 'approve', 'transfer', None]
@@ -35,7 +35,6 @@
 
     swap_inch               |   Swap on 1inch.
     swap_uniswap            |   Swap on UniSwap.
-    swap_woofi              |   Swap on WooFi.
     deposit_aave            |   Supply (Redeem) Aave.
     wrap_eth                |   Wrap (Unwrap) $ETH.
     send_mail               |   Send mail via DMail.
@@ -54,7 +53,7 @@
 class MainSettings:
     MAX_GAS = 100
 
-    GAS_MULTIPLAYER = 0.8
+    GAS_MULTIPLAYER = 1
 
     RANDOM_WALLETS = True
 
@@ -62,7 +61,7 @@ class MainSettings:
 
     USE_PROXY = True
 
-    START_PERIOD = [1, 10]
+    START_PERIOD = [1, 1]
     
     REPEATS_PER_WALLET = 1
 
@@ -73,7 +72,11 @@ class MainSettings:
     LANDINGS_SLEEP = [30, 90]
 
     CUSTOM_ROUTES_MODULES = [
-        []
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail'],
+        ['swap_inch', 'swap_uniswap'],
+        ['increase_allowance', 'approve', 'transfer'],
+        ['deposit_aave', None],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail'],
     ]
 
 """
@@ -177,19 +180,7 @@ class ModulesSettings:
         
         SWAP_REVERSE = True
         
-        API_KEY = 'YOUR-API-KEY' # https://1inch.dev/portfolio-api/
-    
-    class WooFi:
-        FROM_TOKEN = 'ETH'
-        TO_TOKEN = 'USDC'
-        
-        AMOUNT = [0.0005, 0.0009]
-        DECIMAL = 5
-        
-        USE_PERCENTS = False
-        PERCENTS = [3, 7]
-        
-        SWAP_REVERSE = True
+        API_KEY = 'YOUR_DATA' # https://1inch.dev/portfolio-api/
 
     class WrapETH:
         AMOUNT = [0.0005, 0.0009]

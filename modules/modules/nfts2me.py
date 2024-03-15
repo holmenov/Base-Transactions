@@ -11,12 +11,17 @@ class NFT2ME(Account):
 
     @check_gas
     async def mint_nft(self, contracts: list):
-        self.log_send(f'Mint NFT on NFTS2ME.')
+        try:
+            self.log_send(f'Mint NFT on NFTS2ME.')
 
-        contract = self.get_contract(random.choice(contracts), NFTS2ME_ABI)
+            contract = self.get_contract(random.choice(contracts), NFTS2ME_ABI)
 
-        tx_data = await self.get_tx_data()
+            tx_data = await self.get_tx_data()
 
-        tx = await contract.functions.mint(1).build_transaction(tx_data)
+            tx = await contract.functions.mint(1).build_transaction(tx_data)
 
-        await self.execute_transaction(tx)
+            return await self.execute_transaction(tx)
+
+        except Exception as e:
+            self.log_send(f'Error in module «{__class__.__name__}»: {e}', status='error')
+            return False

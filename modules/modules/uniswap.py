@@ -1,8 +1,10 @@
 import time
 
+from hexbytes import HexBytes
+
 from modules.account import Account
 from utils.config import (
-    UNISWAP_CONTRACTS, BASE_TOKENS, UNISWAP_FACTORY_ABI, UNISWAP_QUOTER_ABI, UNISWAP_ROUTER_ABI, ZERO_ADDRESS
+    UNISWAP_CONTRACTS, BASE_TOKENS, UNISWAP_QUOTER_ABI, UNISWAP_ROUTER_ABI
 )
 from settings import MainSettings as SETTINGS
 from utils.utils import async_sleep
@@ -13,90 +15,23 @@ class UniSwap(Account):
     def __init__(self, account_id: int, private_key: str, proxy: str | None) -> None:
         super().__init__(account_id, private_key, proxy)
         
-        self.uniswap_contract = self.get_contract(UNISWAP_CONTRACTS["router"], UNISWAP_ROUTER_ABI)
-    
-    async def get_pool(self, from_token: str, to_token: str):
-        factory = self.get_contract(UNISWAP_CONTRACTS["factory"], UNISWAP_FACTORY_ABI)
+        self.router_contract = self.get_contract(UNISWAP_CONTRACTS["router"], UNISWAP_ROUTER_ABI)
+        self.quoter_contract = self.get_contract(UNISWAP_CONTRACTS["quoter"], UNISWAP_QUOTER_ABI)
 
-        pool = await factory.functions.getPool(
-            self.w3.to_checksum_address(BASE_TOKENS[from_token]),
-            self.w3.to_checksum_address(BASE_TOKENS[to_token]),
-            500
+    def get_path(self, from_token: str, to_token: str):
+        from_token_bytes = HexBytes(BASE_TOKENS[from_token]).rjust(20, b'\0')
+        to_token_bytes = HexBytes(BASE_TOKENS[to_token]).rjust(20, b'\0')
+        fee_bytes = (500).to_bytes(3, 'big')
+
+        return from_token_bytes + fee_bytes + to_token_bytes
+        
+    async def get_min_amount_out(self, path: bytes, amount_in_wei: int):
+        min_amount_out, _, _, _ = await self.quoter_contract.functions.quoteExactInput(
+            path,
+            amount_in_wei
         ).call()
 
-        return pool
-
-    async def get_min_amount_out(self, from_token: str, to_token: str, amount: int):
-        quoter = self.get_contract(UNISWAP_CONTRACTS["quoter"], UNISWAP_QUOTER_ABI)
-
-        quoter_data = await quoter.functions.quoteExactInputSingle((
-            self.w3.to_checksum_address(BASE_TOKENS[from_token]),
-            self.w3.to_checksum_address(BASE_TOKENS[to_token]),
-            amount,
-            500,
-            0
-        )).call()
-        
-        return int(quoter_data[0] - (quoter_data[0] / 100 * SETTINGS.SLIPPAGE))
-    
-    async def swap_to_token(self, from_token: str, to_token: str, amount_wei: int):
-        tx_data = await self.get_tx_data(value=amount_wei)
-
-        deadline = int(time.time()) + 1000000
-
-        min_amount_out = await self.get_min_amount_out(from_token, to_token, amount_wei)
-
-        transaction_data = self.uniswap_contract.encodeABI(
-            fn_name="exactInputSingle",
-            args=[(
-                self.w3.to_checksum_address(BASE_TOKENS[from_token]),
-                self.w3.to_checksum_address(BASE_TOKENS[to_token]),
-                500,
-                self.address,
-                amount_wei,
-                min_amount_out,
-                0
-            )]
-        )
-
-        contract_txn = await self.uniswap_contract.functions.multicall(
-            deadline, [transaction_data]
-        ).build_transaction(tx_data)
-
-        return contract_txn
-    
-    async def swap_to_eth(self, from_token: str, to_token: str, amount_wei: int):
-        await self.approve(amount_wei, BASE_TOKENS[from_token], UNISWAP_CONTRACTS["router"])
-
-        tx_data = await self.get_tx_data()
-
-        deadline = int(time.time()) + 1000000
-
-        min_amount_out = await self.get_min_amount_out(from_token, to_token, amount_wei)
-
-        transaction_data = self.uniswap_contract.encodeABI(
-            fn_name="exactInputSingle",
-            args=[(
-                self.w3.to_checksum_address(BASE_TOKENS[from_token]),
-                self.w3.to_checksum_address(BASE_TOKENS[to_token]),
-                500,
-                "0x0000000000000000000000000000000000000002",
-                amount_wei,
-                min_amount_out,
-                0
-            )]
-        )
-
-        unwrap_data = self.uniswap_contract.encodeABI(
-            fn_name="unwrapWETH9",
-            args=[min_amount_out, self.address]
-        )
-
-        contract_txn = await self.uniswap_contract.functions.multicall(
-            deadline, [transaction_data, unwrap_data]
-        ).build_transaction(tx_data)
-
-        return contract_txn
+        return int(min_amount_out - (min_amount_out / 100 * SETTINGS.SLIPPAGE))
 
     @check_gas
     async def swap(
@@ -111,26 +46,55 @@ class UniSwap(Account):
         max_percent: int,
         swap_reverse: bool
     ):
-        self.log_send(f'{from_token} -> {to_token} | Swap on UniSwap.')
+        try:
+            self.log_send(f'{from_token} -> {to_token} | Swap on UniSwap.')
 
-        if all_amount:
-            amount_wei, _ = await self.get_percent_amount(from_token, min_percent, max_percent)
-        else:
-            amount_wei, _ = await self.get_random_amount(from_token, min_amount, max_amount, decimal)
-        
-        pool = await self.get_pool(from_token, to_token)
-        
-        if pool != ZERO_ADDRESS:
-            if from_token == "ETH":
-                contract_txn = await self.swap_to_token(from_token, to_token, amount_wei)
+            if all_amount:
+                amount_wei, _ = await self.get_percent_amount(from_token, min_percent, max_percent)
             else:
-                contract_txn = await self.swap_to_eth(from_token, to_token, amount_wei)
+                amount_wei, _ = await self.get_random_amount(from_token, min_amount, max_amount, decimal)
+            
+            path = self.get_path(from_token, to_token)
+            min_amount_out = await self.get_min_amount_out(path, amount_wei)
+            
+            if from_token != 'ETH':
+                await self.approve(amount_wei, BASE_TOKENS[from_token], UNISWAP_CONTRACTS['router'])
+            
+            tx_data = self.router_contract.encodeABI(
+                fn_name='exactInput',
+                args=[(
+                    path,
+                    self.address if to_token != 'ETH' else '0x0000000000000000000000000000000000000002',
+                    amount_wei,
+                    min_amount_out
+                )]
+            )
+            
+            full_data = [tx_data]
+            
+            if from_token == 'ETH' or to_token == 'ETH':
+                tx_additional_data = self.router_contract.encodeABI(
+                    fn_name='unwrapWETH9' if from_token != 'ETH' else 'refundETH',
+                    args=[
+                        min_amount_out,
+                        self.address
+                    ] if from_token != 'ETH' else None
+                )
 
-            await self.execute_transaction(contract_txn)
+                full_data.append(tx_additional_data)
+            
+            tx_params = await self.get_tx_data(value=amount_wei if from_token == 'ETH' else 0)
+            
+            tx = await self.router_contract.functions.multicall(full_data).build_transaction(tx_params)
+            
+            tx_status = await self.execute_transaction(tx)
             
             if swap_reverse:
                 await async_sleep(5, 15, logs=False)
-                await self.swap(to_token, from_token, 0.01, 0.01, decimal, True, 100, 100, False)
+                return await self.swap(to_token, from_token, 0.01, 0.01, decimal, True, 100, 100, False)
+            else:
+                return tx_status
 
-        else:
-            self.log_send(f'Swap path on UniSwap {from_token} to {to_token} not found!', status='error')
+        except Exception as e:
+            self.log_send(f'Error in module «{__class__.__name__}»: {e}', status='error')
+            return False
