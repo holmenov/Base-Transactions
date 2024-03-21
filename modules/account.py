@@ -140,6 +140,16 @@ class Account:
 
             await async_sleep(5, 15, logs=False)
     
+    async def get_priority_fee(self):
+        fee_history = await self.w3.eth.fee_history(25, 'latest', [20.0])
+        non_empty_block_priority_fees = [fee[0] for fee in fee_history["reward"] if fee[0] != 0]
+        
+        divisor_priority = max(len(non_empty_block_priority_fees), 1)
+        
+        priority_fee = int(round(sum(non_empty_block_priority_fees) / divisor_priority))
+
+        return priority_fee
+    
     async def get_tx_data(self, value: int = 0):
         tx = {
             'chainId': await self.w3.eth.chain_id,
@@ -149,15 +159,18 @@ class Account:
         }
 
         if self.eip_1559_support:
-            base_fee = (await self.w3.eth.get_block('latest'))['baseFeePerGas']
-            max_fee_per_gas = base_fee
-            max_priority_fee_per_gas = base_fee
+            base_fee = await self.w3.eth.gas_price
+            max_priority_fee_per_gas = int(await self.get_priority_fee() * SETTINGS.GAS_MULTIPLAYER)
+            max_fee_per_gas = int(base_fee + max_priority_fee_per_gas * SETTINGS.GAS_MULTIPLAYER)
 
-            tx['maxFeePerGas'] = max_fee_per_gas
+            if max_priority_fee_per_gas > max_fee_per_gas:
+                max_priority_fee_per_gas = int(max_fee_per_gas * 0.95)
+
             tx['maxPriorityFeePerGas'] = max_priority_fee_per_gas
+            tx['maxFeePerGas'] = max_fee_per_gas
             tx['type'] = '0x2'
         else:
-            tx['gasPrice'] = await self.w3.eth.gas_price
+            tx['gasPrice'] = int(await self.w3.eth.gas_price * SETTINGS.GAS_MULTIPLAYER)
 
         return tx
 

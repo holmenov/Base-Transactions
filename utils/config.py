@@ -28,12 +28,6 @@ with open('data/rubyscore/abi.json', "r") as file:
 with open('data/owlto/abi.json', "r") as file:
     OWLTO_ABI = json.load(file)
 
-with open('data/sushiswap/quoter.json', "r") as file:
-    SUSHISWAP_QUOTER_ABI = json.load(file)
-
-with open('data/sushiswap/router.json', "r") as file:
-    SUSHISWAP_ROUTER_ABI = json.load(file)
-
 with open('data/uniswap/quoter.json', "r") as file:
     UNISWAP_QUOTER_ABI = json.load(file)
 

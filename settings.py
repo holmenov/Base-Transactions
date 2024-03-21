@@ -61,7 +61,7 @@ class MainSettings:
 
     USE_PROXY = True
 
-    START_PERIOD = [1, 1]
+    START_PERIOD = [1, 600]
     
     REPEATS_PER_WALLET = 1
 
@@ -75,8 +75,23 @@ class MainSettings:
         ['rubyscore_vote', 'owlto_checkin', 'send_mail'],
         ['swap_inch', 'swap_uniswap'],
         ['increase_allowance', 'approve', 'transfer'],
-        ['deposit_aave', None],
+        ['deposit_aave'],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail', None],
         ['rubyscore_vote', 'owlto_checkin', 'send_mail'],
+        ['increase_allowance', 'approve', 'transfer'],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail', None],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail'],
+        ['increase_allowance', 'approve', 'transfer'],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail', None],
+        ['swap_inch', 'swap_uniswap'],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail'],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail'],
+        ['increase_allowance', 'approve', 'transfer'],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail', None],
+        ['deposit_aave'],
+        ['swap_inch', 'swap_uniswap'],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail'],
+        ['rubyscore_vote', 'owlto_checkin', 'send_mail'], 
     ]
 
 """
@@ -84,7 +99,7 @@ class MainSettings:
 
     SYMBOL = 'ETH'                      |   Data for withdraw from OKX.
     CHAIN = 'Base'                      |   You can find this data on OKX.
-    FEE = 0.0002                        |   https://www.okx.com/balance/withdrawal
+    FEE = 0.00004                       |   https://www.okx.com/balance/withdrawal
 
     AMOUNT = [0.006, 0.008]             |   Amount from and amount to withdrawal.
     
@@ -102,9 +117,9 @@ class MainSettings:
 class OKXSettings:
     SYMBOL = 'ETH'
     CHAIN = 'Base'
-    FEE = 0.0002
+    FEE = 0.00004
 
-    AMOUNT_WITHDRAW = [0.011, 0.012]
+    AMOUNT_WITHDRAW = [0.0050, 0.0055]
 
     BALANCE_TOP_UP = 0.01
     
@@ -148,7 +163,7 @@ class OKXSettings:
 class ModulesSettings:
     
     class Aave:
-        AMOUNT = [0.0005, 0.0009]
+        AMOUNT = [0.0005, 0.002]
         DECIMAL = 5
         
         USE_PERCENTS = False
@@ -160,7 +175,7 @@ class ModulesSettings:
         FROM_TOKEN = 'ETH'
         TO_TOKEN = 'USDC'
         
-        AMOUNT = [0.0005, 0.0009]
+        AMOUNT = [0.0005, 0.002]
         DECIMAL = 5
         
         USE_PERCENTS = False
@@ -172,7 +187,7 @@ class ModulesSettings:
         FROM_TOKEN = 'ETH'
         TO_TOKEN = 'USDC'
         
-        AMOUNT = [0.0005, 0.0009]
+        AMOUNT = [0.0005, 0.002]
         DECIMAL = 5
         
         USE_PERCENTS = False
@@ -183,7 +198,7 @@ class ModulesSettings:
         API_KEY = 'YOUR_DATA' # https://1inch.dev/portfolio-api/
 
     class WrapETH:
-        AMOUNT = [0.0005, 0.0009]
+        AMOUNT = [0.0005, 0.002]
         DECIMAL = 5
         
         USE_PERCENTS = False

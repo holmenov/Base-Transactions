@@ -12,7 +12,7 @@ submenus = {
     'start-menu': [
         questionary.Choice('🚀 Custom Module Routes', 'custom-routes'),
         questionary.Choice('✨ One Selected Module', 'one_selected_module'),
-        questionary.Choice('📥 OKX Balance Modules', 'okx-modules'),
+        questionary.Choice('📥 OKX Balance Modules', 'okx_modules'),
         questionary.Choice('💼 Base Balance Checker', 'balance-checker'),
         questionary.Choice('❌ Exit', 'exit'),
     ],
@@ -56,7 +56,9 @@ def main():
     
     data = get_wallets()
     
-    if selected_mode in submenus: selected_mode = show_submenu(selected_mode)
+    if selected_mode in submenus:
+        selected_mode = show_submenu(selected_mode)
+        asyncio.run(start_tasks(data, selected_mode))
     elif selected_mode == 'balance-checker': asyncio.run(run_check_balance(data))
     elif selected_mode == 'exit': sys.exit()
     else: asyncio.run(start_tasks(data, None))
